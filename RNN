@@ -1,0 +1,48 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+
+# Importing the training set
+training_set = pd.read_csv('TATASTEEL.NS.csv')
+training_set = training_set.iloc[:,0:1].values
+
+# Feature Scaling
+from sklearn.preprocessing import MinMaxScaler
+sc = MinMaxScaler()
+training_set = sc.fit_transform(training_set)
+
+# Getting the inputs and Outputs
+X_train = training_set[0:5498]
+y_train = training_set[1:5499]
+
+# Reshaping
+X_train = np.reshape(X_train, (5498, 1, 1))
+
+# Part 2 - Building the RNN
+
+# Importing the Keras libraries and packages
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.layers import LSTM
+
+# Initialising the RNN
+regressor = Sequential()
+
+# Adding the first LSTM layer and some Dropout regularisation
+regressor.add(LSTM(units = 4, activation = 'sigmoid', input_shape = (None, 1)))
+
+# Adding a second LSTM layer and some Dropout regularisation
+regressor.add(Dense(units = 1))
+
+# Adding a third LSTM layer and some Dropout regularisation
+regressor.compile(optimizer = 'adam', loss = 'mean_squared_error')
+
+# Fitting the RNN to the Training set
+regressor.fit(X_train, y_train, epochs = 200, batch_size = 32)
+
+# Getting the predicted stock price of 2017
+    inputs = (582.25)
+    inputs = sc.transform(inputs)
+    inputs = np.reshape(inputs, (1, 1, 1))
+    predicted_stock_price = regressor.predict(inputs)
+    predicted_stock_price = sc.inverse_transform(predicted_stock_price)
